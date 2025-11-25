@@ -1,6 +1,7 @@
 """Sensor platform for HasWave Deprem."""
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from homeassistant.components.sensor import SensorEntity, SensorEntityDescription, SensorStateClass
@@ -10,6 +11,8 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
 
 from .const import DOMAIN
+
+_LOGGER = logging.getLogger(__name__)
 
 SENSOR_DESCRIPTIONS: dict[str, SensorEntityDescription] = {
     "latest": SensorEntityDescription(
@@ -76,52 +79,58 @@ class HasWaveDepremSensor(CoordinatorEntity, SensorEntity):
         self._attr_name = f"Deprem - {description.name}"
     
     @property
+    def available(self) -> bool:
+        """Return if entity is available."""
+        # Coordinator başarıyla yüklendiyse available ol
+        return self.coordinator.last_update_success
+    
+    @property
     def native_value(self) -> str | float | int | None:
         """Return the state of the sensor."""
-        if self.coordinator.data is None:
-            _LOGGER.debug(f"Sensor {self._sensor_key}: Coordinator data is None")
-            return None
-        
+        # Coordinator data None ise, boş liste olarak kabul et
         earthquakes = self.coordinator.data
+        if earthquakes is None:
+            _LOGGER.debug(f"Sensor {self._sensor_key}: Coordinator data is None, boş liste kullanılıyor")
+            earthquakes = []
+        
         _LOGGER.debug(f"Sensor {self._sensor_key}: {len(earthquakes) if isinstance(earthquakes, list) else 'N/A'} deprem verisi var")
         
         if self._sensor_key == "latest":
-            if earthquakes:
+            if earthquakes and len(earthquakes) > 0:
                 latest = earthquakes[0]
                 return f"{latest.get('magnitude', 'N/A')} - {latest.get('location', 'N/A')}"
             return "Yok"
         
         elif self._sensor_key == "magnitude":
-            if earthquakes:
+            if earthquakes and len(earthquakes) > 0:
                 return float(earthquakes[0].get("magnitude", 0))
             return 0.0
         
         elif self._sensor_key == "max_magnitude":
-            if earthquakes:
-                magnitudes = [float(eq.get("magnitude", 0)) for eq in earthquakes]
+            if earthquakes and len(earthquakes) > 0:
+                magnitudes = [float(eq.get("magnitude", 0)) for eq in earthquakes if eq.get("magnitude")]
                 return max(magnitudes) if magnitudes else 0.0
             return 0.0
         
         elif self._sensor_key == "avg_magnitude":
-            if earthquakes:
-                magnitudes = [float(eq.get("magnitude", 0)) for eq in earthquakes]
+            if earthquakes and len(earthquakes) > 0:
+                magnitudes = [float(eq.get("magnitude", 0)) for eq in earthquakes if eq.get("magnitude")]
                 return sum(magnitudes) / len(magnitudes) if magnitudes else 0.0
             return 0.0
         
         elif self._sensor_key == "count":
-            return len(earthquakes)
+            return len(earthquakes) if isinstance(earthquakes, list) else 0
         
         return None
     
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return additional state attributes."""
-        if self.coordinator.data is None:
-            return {}
-        
         earthquakes = self.coordinator.data
+        if earthquakes is None:
+            earthquakes = []
         
-        if self._sensor_key == "latest" and earthquakes:
+        if self._sensor_key == "latest" and earthquakes and len(earthquakes) > 0:
             latest = earthquakes[0]
             return {
                 "magnitude": latest.get("magnitude"),
