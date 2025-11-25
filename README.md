@@ -14,7 +14,7 @@ KOERI'den deprem verilerini çekerek Home Assistant'a sensor olarak ekler.
 ### HACS ile Kurulum
 
 1. HACS → Integrations → Custom repositories
-2. Repository URL: `https://github.com/HasWave/Home-Assistant-Deprem`
+2. Repository URL: `https://github.com/HasWave/Home-Assistant-Deprem-Bildirimi`
 3. Category: Integration
 4. Add butonuna tıklayın
 5. HACS → Integrations → HasWave Deprem'i bulun ve yükleyin
@@ -56,4 +56,5 @@ Detaylı dokümantasyon için: [GitHub Repository](https://github.com/HasWave/Ho
 **HasWave**
 
 🌐 [HasWave](https://haswave.com) | 📱 [Telegram](https://t.me/HasWave) | 📦 [GitHub](https://github.com/HasWave)
+
 
