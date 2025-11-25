@@ -20,11 +20,21 @@ PLATFORMS: list[Platform] = [Platform.SENSOR]
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up HasWave Deprem from a config entry."""
     
+    # "Tüm depremler" seçeneği kontrolü
+    all_earthquakes = entry.data.get("all_earthquakes", True)
+    city = ""
+    region = ""
+    
+    # Eğer "Tüm depremler" seçili değilse, city veya region kullan
+    if not all_earthquakes:
+        city = entry.data.get("city", "")
+        region = entry.data.get("region", "")
+    
     api = HasWaveDepremAPI(
         api_url=entry.data.get("api_url", "https://api.haswave.com/api/v1/deprem"),
         min_magnitude=entry.data.get("min_magnitude", 0.0),
-        city=entry.data.get("city", ""),
-        region=entry.data.get("region", ""),
+        city=city,
+        region=region,
     )
     
     update_interval = entry.data.get("update_interval", DEFAULT_UPDATE_INTERVAL)
