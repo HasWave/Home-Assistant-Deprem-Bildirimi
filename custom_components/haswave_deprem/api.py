@@ -35,19 +35,40 @@ class HasWaveDepremAPI:
             if self.region:
                 params["region"] = self.region
             
+            _LOGGER.debug(f"API isteği: {self.api_url} - Params: {params}")
             response = requests.get(self.api_url, params=params, timeout=15)
             
             if response.status_code == 200:
                 data = response.json()
-                if isinstance(data, dict) and data.get("success"):
-                    return data.get("data", [])
+                _LOGGER.debug(f"API yanıtı: {type(data)}, Keys: {list(data.keys()) if isinstance(data, dict) else 'N/A'}")
+                
+                if isinstance(data, dict):
+                    if data.get("success"):
+                        earthquakes = data.get("data", [])
+                        if earthquakes:
+                            _LOGGER.info(f"API'den {len(earthquakes)} deprem verisi alındı")
+                        else:
+                            _LOGGER.warning("API'den boş liste döndü (success=True ama data boş)")
+                        return earthquakes
+                    else:
+                        _LOGGER.error(f"API hatası: {data.get('error', 'Bilinmeyen hata')}")
+                        return None
                 elif isinstance(data, list):
+                    if data:
+                        _LOGGER.info(f"API'den {len(data)} deprem verisi alındı (liste formatında)")
+                    else:
+                        _LOGGER.warning("API'den boş liste döndü")
                     return data
+                else:
+                    _LOGGER.error(f"Beklenmeyen API yanıt formatı: {type(data)}")
+                    return None
             else:
-                _LOGGER.error(f"HTTP hatası: {response.status_code}")
+                _LOGGER.error(f"HTTP hatası: {response.status_code} - {response.text}")
+                return None
                 
         except Exception as e:
-            _LOGGER.error(f"API bağlantı hatası: {e}")
+            _LOGGER.error(f"API bağlantı hatası: {e}", exc_info=True)
+            return None
         
-        return []
+        return None
 
