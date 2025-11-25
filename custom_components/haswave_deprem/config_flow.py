@@ -53,8 +53,16 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     
     result = await hass.async_add_executor_job(api.fetch_earthquakes)
     
+    # None dönerse hata var demektir
     if result is None:
         raise CannotConnect
+    
+    # Boş liste de geçerli bir sonuçtur (deprem olmayabilir)
+    if isinstance(result, list):
+        if len(result) == 0:
+            _LOGGER.info(f"API bağlantısı başarılı ama deprem verisi yok. Filtreler: Min Büyüklük={min_magnitude}, İl={data.get('city', 'Yok')}, Bölge={data.get('region', 'Yok')}")
+        else:
+            _LOGGER.info(f"API bağlantısı başarılı: {len(result)} deprem bulundu")
     
     return {"title": "HasWave Deprem"}
 
