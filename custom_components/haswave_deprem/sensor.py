@@ -57,7 +57,7 @@ async def async_setup_entry(
     
     entities = []
     for key, description in SENSOR_DESCRIPTIONS.items():
-        entities.append(HasWaveDepremSensor(coordinator, description, key))
+        entities.append(HasWaveDepremSensor(coordinator, description, key, entry.entry_id))
     
     async_add_entities(entities)
 
@@ -70,12 +70,14 @@ class HasWaveDepremSensor(CoordinatorEntity, SensorEntity):
         coordinator: DataUpdateCoordinator,
         description: SensorEntityDescription,
         sensor_key: str,
+        entry_id: str,
     ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator)
         self.entity_description = description
         self._sensor_key = sensor_key
-        self._attr_unique_id = f"{DOMAIN}_{sensor_key}"
+        # Entry ID ekleyerek unique ID çakışmasını önle
+        self._attr_unique_id = f"{DOMAIN}_{entry_id}_{sensor_key}"
         self._attr_name = f"Deprem - {description.name}"
     
     @property
