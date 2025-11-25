@@ -10,7 +10,7 @@
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
 
-<a href="https://my.home-assistant.io/redirect/hacs_repository/?owner=HasWave&repository=HACS-Deprem&category=Integration" target="_blank">
+<a href="https://my.home-assistant.io/redirect/hacs_repository/?owner=HasWave&repository=Home-Assistant-Deprem-Bildirimi&category=Integration" target="_blank">
   <img src="https://my.home-assistant.io/badges/hacs_repository.svg" alt="Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.">
 </a>
 
@@ -68,32 +68,26 @@
 
 Integration otomatik olarak şu sensor'ları oluşturur:
 
-#### `sensor.deprem_magnitude`
-Son deprem büyüklüğü (statistics için)
+#### `sensor.deprem_son_deprem`
+Son deprem bilgisi (format: "Büyüklük - Lokasyon"). Tüm detaylar attributes içinde:
+- `magnitude` - Büyüklük
+- `location` - Lokasyon
+- `depth` - Derinlik (km)
+- `time` - Tarih/Saat
+- `latitude` - Enlem
+- `longitude` - Boylam
 
-#### `sensor.deprem_location`
-Son deprem lokasyonu
+#### `sensor.deprem_buyukluk`
+Son deprem büyüklüğü (statistics için, `state_class: measurement`)
 
-#### `sensor.deprem_date`
-Son deprem tarihi
+#### `sensor.deprem_maksimum_buyukluk`
+Maksimum deprem büyüklüğü (statistics için, `state_class: measurement`)
 
-#### `sensor.deprem_depth`
-Son deprem derinliği (km birimi entity'de tanımlı)
+#### `sensor.deprem_ortalama_buyukluk`
+Ortalama deprem büyüklüğü (statistics için, `state_class: measurement`)
 
-#### `sensor.deprem_latest`
-Son deprem (tüm bilgiler attributes içinde)
-
-#### `sensor.deprem_max_magnitude`
-Maksimum deprem büyüklüğü (statistics için)
-
-#### `sensor.deprem_avg_magnitude`
-Ortalama deprem büyüklüğü (statistics için)
-
-#### `sensor.deprem_count`
-Toplam deprem sayısı
-
-#### `sensor.deprem_list`
-Son 10 deprem listesi (JSON attributes içinde)
+#### `sensor.deprem_deprem_sayisi`
+Toplam deprem sayısı (statistics için, `state_class: measurement`)
 
 ### Dashboard Kartı
 
@@ -105,21 +99,48 @@ Lovelace UI'da kart ekleyin:
 type: entities
 title: Deprem Bilgileri
 entities:
-  - entity: sensor.deprem_latest
+  - entity: sensor.deprem_son_deprem
     name: Son Deprem
     icon: mdi:earthquake
-  - entity: sensor.deprem_magnitude
+  - entity: sensor.deprem_buyukluk
     name: Büyüklük
     icon: mdi:gauge
-  - entity: sensor.deprem_location
+  - entity: sensor.deprem_maksimum_buyukluk
+    name: Maksimum Büyüklük
+    icon: mdi:gauge
+  - entity: sensor.deprem_ortalama_buyukluk
+    name: Ortalama Büyüklük
+    icon: mdi:gauge
+  - entity: sensor.deprem_deprem_sayisi
+    name: Deprem Sayısı
+    icon: mdi:counter
+```
+
+**Not:** Son deprem detayları (lokasyon, tarih, derinlik) için `sensor.deprem_son_deprem` entity'sinin attributes'larını kullanabilirsiniz:
+
+```yaml
+type: entities
+title: Son Deprem Detayları
+entities:
+  - entity: sensor.deprem_son_deprem
+    name: Son Deprem
+    icon: mdi:earthquake
+  - type: attribute
+    entity: sensor.deprem_son_deprem
+    attribute: location
     name: Lokasyon
     icon: mdi:map-marker
-  - entity: sensor.deprem_date
-    name: Tarih
+  - type: attribute
+    entity: sensor.deprem_son_deprem
+    attribute: time
+    name: Tarih/Saat
     icon: mdi:calendar-clock
-  - entity: sensor.deprem_depth
+  - type: attribute
+    entity: sensor.deprem_son_deprem
+    attribute: depth
     name: Derinlik
     icon: mdi:arrow-down
+    unit_of_measurement: km
 ```
 
 ### Otomasyon Örneği
@@ -131,15 +152,15 @@ automation:
   - alias: "Deprem Uyarısı - 4.0+"
     trigger:
       platform: numeric_state
-      entity_id: sensor.deprem_magnitude
+      entity_id: sensor.deprem_buyukluk
       above: 4.0
     action:
       - service: notify.mobile_app
         data:
           title: "🚨 Deprem Uyarısı!"
           message: >
-            {{ states('sensor.deprem_location') }} yakınlarında
-            {{ states('sensor.deprem_magnitude') }} büyüklüğünde deprem!
+            {{ state_attr('sensor.deprem_son_deprem', 'location') }} yakınlarında
+            {{ states('sensor.deprem_buyukluk') }} büyüklüğünde deprem!
           data:
             priority: high
             sound: default
@@ -239,4 +260,3 @@ Bu proje MIT lisansı altında lisanslanmıştır.
 ⭐ Bu projeyi beğendiyseniz yıldız vermeyi unutmayın!
 
 Made with ❤️ by HasWave
-
