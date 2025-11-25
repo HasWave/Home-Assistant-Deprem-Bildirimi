@@ -15,16 +15,18 @@
       },
       "filters": {
         "title": "Gelişmiş Filtreler",
-        "description": "İsteğe bağlı olarak deprem verilerini filtreleyebilirsiniz. Tüm alanları boş bırakabilirsiniz.",
+        "description": "İsteğe bağlı olarak deprem verilerini filtreleyebilirsiniz.",
         "data": {
+          "all_earthquakes": "Tüm Depremler",
           "min_magnitude": "Minimum Büyüklük",
           "city": "İl",
           "region": "Bölge"
         },
         "data_description": {
+          "all_earthquakes": "Tüm depremleri göster (işaretli ise il/bölge filtresi uygulanmaz)",
           "min_magnitude": "Gösterilecek minimum deprem büyüklüğü (varsayılan: 0.0 = tüm depremler). Örnek: 3.0 sadece 3.0 ve üzeri depremleri gösterir",
-          "city": "Belirli bir il için filtreleme (opsiyonel). Örnek: İSTANBUL, ANKARA. Boş bırakılırsa tüm iller için sonuç döner",
-          "region": "Belirli bir bölge için filtreleme (opsiyonel). Boş bırakılırsa tüm bölgeler için sonuç döner"
+          "city": "Belirli bir il için filtreleme (opsiyonel). Örnek: İSTANBUL, ANKARA. 'Tüm Depremler' işaretli değilse kullanılır",
+          "region": "Belirli bir bölge için filtreleme (opsiyonel). 'Tüm Depremler' işaretli değilse kullanılır"
         }
       }
     },
