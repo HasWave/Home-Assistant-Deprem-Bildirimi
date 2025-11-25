@@ -20,6 +20,11 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
     {
         vol.Optional("api_url", default=DEFAULT_API_URL): str,
         vol.Optional("update_interval", default=DEFAULT_UPDATE_INTERVAL): int,
+    }
+)
+
+STEP_FILTERS_DATA_SCHEMA = vol.Schema(
+    {
         vol.Optional("min_magnitude", default=DEFAULT_MIN_MAGNITUDE): float,
         vol.Optional("city", default=""): str,
         vol.Optional("region", default=""): str,
@@ -49,29 +54,51 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     
     VERSION = 1
     
+    def __init__(self):
+        """Initialize the config flow."""
+        self._user_input = {}
+    
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
-        """Handle the initial step."""
+        """Handle the initial step - basic settings."""
         if user_input is None:
             return self.async_show_form(
                 step_id="user", data_schema=STEP_USER_DATA_SCHEMA
             )
         
+        # Temel ayarları kaydet
+        self._user_input.update(user_input)
+        
+        # Filtreler adımına geç
+        return await self.async_step_filters()
+    
+    async def async_step_filters(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Handle the filters step - advanced settings."""
+        if user_input is None:
+            return self.async_show_form(
+                step_id="filters", data_schema=STEP_FILTERS_DATA_SCHEMA
+            )
+        
+        # Filtreleri ekle
+        self._user_input.update(user_input)
+        
         errors = {}
         
         try:
-            info = await validate_input(self.hass, user_input)
+            info = await validate_input(self.hass, self._user_input)
         except CannotConnect:
             errors["base"] = "cannot_connect"
         except Exception:
             _LOGGER.exception("Unexpected exception")
             errors["base"] = "unknown"
         else:
-            return self.async_create_entry(title=info["title"], data=user_input)
+            return self.async_create_entry(title=info["title"], data=self._user_input)
         
         return self.async_show_form(
-            step_id="user", data_schema=STEP_USER_DATA_SCHEMA, errors=errors
+            step_id="filters", data_schema=STEP_FILTERS_DATA_SCHEMA, errors=errors
         )
 
 
