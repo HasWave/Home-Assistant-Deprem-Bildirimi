@@ -5,11 +5,11 @@
         "title": "Temel Ayarlar",
         "description": "Deprem bilgilerini almak için temel ayarları yapın. Varsayılan değerler önerilen ayarlardır.",
         "data": {
-          "api_url": "API URL",
+          "api_url": "API Adresi",
           "update_interval": "Güncelleme Aralığı (saniye)"
         },
         "data_description": {
-          "api_url": "API endpoint URL'i (varsayılan: https://api.haswave.com/api/v1/deprem)",
+          "api_url": "API endpoint adresi (varsayılan: https://api.haswave.com/api/v1/deprem)",
           "update_interval": "Veri güncelleme aralığı saniye cinsinden (varsayılan: 300 = 5 dakika). Önerilen: 300-1800 saniye arası"
         }
       },
@@ -18,8 +18,8 @@
         "description": "İsteğe bağlı olarak deprem verilerini filtreleyebilirsiniz. Tüm alanları boş bırakabilirsiniz.",
         "data": {
           "min_magnitude": "Minimum Büyüklük",
-          "city": "İl Filtresi",
-          "region": "Bölge Filtresi"
+          "city": "İl",
+          "region": "Bölge"
         },
         "data_description": {
           "min_magnitude": "Gösterilecek minimum deprem büyüklüğü (varsayılan: 0.0 = tüm depremler). Örnek: 3.0 sadece 3.0 ve üzeri depremleri gösterir",
