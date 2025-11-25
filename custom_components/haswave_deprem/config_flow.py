@@ -25,7 +25,7 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
 
 STEP_FILTERS_DATA_SCHEMA = vol.Schema(
     {
-        vol.Optional("min_magnitude", default=DEFAULT_MIN_MAGNITUDE): float,
+        vol.Optional("min_magnitude", default=DEFAULT_MIN_MAGNITUDE): vol.Coerce(float),
         vol.Optional("city", default=""): str,
         vol.Optional("region", default=""): str,
     }
@@ -34,9 +34,19 @@ STEP_FILTERS_DATA_SCHEMA = vol.Schema(
 
 async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str, Any]:
     """Validate the user input allows us to connect."""
+    # min_magnitude'u float'a çevir
+    min_magnitude = data.get("min_magnitude", DEFAULT_MIN_MAGNITUDE)
+    if isinstance(min_magnitude, str):
+        try:
+            min_magnitude = float(min_magnitude)
+        except (ValueError, TypeError):
+            min_magnitude = DEFAULT_MIN_MAGNITUDE
+    elif not isinstance(min_magnitude, (int, float)):
+        min_magnitude = DEFAULT_MIN_MAGNITUDE
+    
     api = HasWaveDepremAPI(
         api_url=data.get("api_url", DEFAULT_API_URL),
-        min_magnitude=data.get("min_magnitude", DEFAULT_MIN_MAGNITUDE),
+        min_magnitude=float(min_magnitude),
         city=data.get("city", ""),
         region=data.get("region", ""),
     )
