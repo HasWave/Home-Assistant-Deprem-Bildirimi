@@ -1,0 +1,40 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Temel Ayarlar",
+        "description": "Deprem bilgilerini almak için temel ayarları yapın. Varsayılan değerler önerilen ayarlardır.",
+        "data": {
+          "api_url": "API URL",
+          "update_interval": "Güncelleme Aralığı (saniye)"
+        },
+        "data_description": {
+          "api_url": "API endpoint URL'i (varsayılan: https://api.haswave.com/api/v1/deprem)",
+          "update_interval": "Veri güncelleme aralığı saniye cinsinden (varsayılan: 300 = 5 dakika). Önerilen: 300-1800 saniye arası"
+        }
+      },
+      "filters": {
+        "title": "Gelişmiş Filtreler",
+        "description": "İsteğe bağlı olarak deprem verilerini filtreleyebilirsiniz. Tüm alanları boş bırakabilirsiniz.",
+        "data": {
+          "min_magnitude": "Minimum Büyüklük",
+          "city": "İl Filtresi",
+          "region": "Bölge Filtresi"
+        },
+        "data_description": {
+          "min_magnitude": "Gösterilecek minimum deprem büyüklüğü (varsayılan: 0.0 = tüm depremler). Örnek: 3.0 sadece 3.0 ve üzeri depremleri gösterir",
+          "city": "Belirli bir il için filtreleme (opsiyonel). Örnek: İSTANBUL, ANKARA. Boş bırakılırsa tüm iller için sonuç döner",
+          "region": "Belirli bir bölge için filtreleme (opsiyonel). Boş bırakılırsa tüm bölgeler için sonuç döner"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "API'ye bağlanılamadı. Lütfen bilgilerinizi kontrol edin.",
+      "unknown": "Beklenmeyen bir hata oluştu."
+    },
+    "abort": {
+      "already_configured": "Bu entegrasyon zaten yapılandırılmış."
+    }
+  }
+}
+
