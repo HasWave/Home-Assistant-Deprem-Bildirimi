@@ -31,7 +31,24 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     
     async def async_update_data():
         """Fetch data from API."""
-        return await hass.async_add_executor_job(api.fetch_earthquakes)
+        try:
+            data = await hass.async_add_executor_job(api.fetch_earthquakes)
+            if data is not None:
+                if isinstance(data, list):
+                    if data:
+                        _LOGGER.info(f"API'den {len(data)} deprem verisi alındı")
+                    else:
+                        _LOGGER.warning("API'den boş liste döndü (deprem yok)")
+                else:
+                    _LOGGER.warning(f"API'den beklenmeyen veri tipi döndü: {type(data)}")
+            else:
+                _LOGGER.warning("API'den veri alınamadı (None döndü)")
+            # None yerine boş liste döndür ki sensor'lar çalışsın
+            return data if data is not None else []
+        except Exception as err:
+            _LOGGER.error(f"Veri güncelleme hatası: {err}", exc_info=True)
+            # Hata durumunda boş liste döndür, sensor'lar çalışmaya devam etsin
+            return []
     
     coordinator = DataUpdateCoordinator(
         hass,
@@ -41,7 +58,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         update_interval=timedelta(seconds=update_interval),
     )
     
-    await coordinator.async_config_entry_first_refresh()
+    try:
+        await coordinator.async_config_entry_first_refresh()
+    except Exception as err:
+        _LOGGER.error(f"İlk veri yükleme hatası: {err}")
+        # Hata olsa bile devam et, sensor'lar oluşturulsun
     
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {
         "coordinator": coordinator,
