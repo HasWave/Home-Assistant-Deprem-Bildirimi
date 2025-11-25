@@ -78,10 +78,12 @@ class HasWaveDepremSensor(CoordinatorEntity, SensorEntity):
     @property
     def native_value(self) -> str | float | int | None:
         """Return the state of the sensor."""
-        if not self.coordinator.data:
+        if self.coordinator.data is None:
+            _LOGGER.debug(f"Sensor {self._sensor_key}: Coordinator data is None")
             return None
         
         earthquakes = self.coordinator.data
+        _LOGGER.debug(f"Sensor {self._sensor_key}: {len(earthquakes) if isinstance(earthquakes, list) else 'N/A'} deprem verisi var")
         
         if self._sensor_key == "latest":
             if earthquakes:
@@ -114,7 +116,7 @@ class HasWaveDepremSensor(CoordinatorEntity, SensorEntity):
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return additional state attributes."""
-        if not self.coordinator.data:
+        if self.coordinator.data is None:
             return {}
         
         earthquakes = self.coordinator.data
